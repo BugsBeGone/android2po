@@ -101,7 +101,7 @@ class Config(object):
             'name': 'clear-obsolete',
             'help': 'during export do not add obsolete strings to the generated .po files',
             'dest': 'clear_obsolete',
-            'default': True,
+            'default': False,
             'kwargs': {'action': 'store_true', }
         },
         {
