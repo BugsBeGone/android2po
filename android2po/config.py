@@ -112,6 +112,13 @@ class Config(object):
             'default': 76,
             'kwargs': {'metavar': 'N', 'type': int}
         },
+        {
+            'name': 'indent-tabs',
+            'help': 'use tabs rather than spaces for indentation in the generated XML files',
+            'dest': 'indent_tabs',
+            'default': False,
+            'kwargs': {'action': 'store_true', }
+        },
     )
 
     def __init__(self):

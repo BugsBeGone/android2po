@@ -42,7 +42,7 @@ def catalog2string(catalog, **kwargs):
     return sf.getvalue().decode('utf-8')
 
 
-def xml2string(tree, action):
+def xml2string(tree, action, indent_str):
     """Helper that returns a ``ResourceTree`` as an XML string.
 
     TODO: It would be cool if this could try to recreate the formatting
@@ -50,7 +50,7 @@ def xml2string(tree, action):
     """
     ENCODING = 'utf-8'
     dom = convert.write_xml(tree, warnfunc=action.message)
-    etree.indent(dom, space="    ")
+    etree.indent(dom, space=indent_str)
     return etree.tostring(dom, xml_declaration=False,
                           doctype='<?xml version="1.0" encoding="' + ENCODING + '"?>',
                           encoding=ENCODING, pretty_print=True).decode(ENCODING)
@@ -574,13 +574,14 @@ class ImportCommand(Command):
             language_xml = language.xml(kind)
             language_po = language.po(kind)
             action = self.w.begin(language_xml)
+            indent_str = "\t" if self.env.config.indent_tabs else "    "
 
             if skip_due_to_incomplete:
                 # TODO: Creating a catalog object here is kind of clunky.
                 # Idially, we'd refactor convert.py so that we can use a
                 # dict to represent a resource XML file.
                 xmldata = po2xml(self.env, action, Catalog(locale=language.code))
-                write_file(self, language_xml, xml2string(xmldata, action),
+                write_file(self, language_xml, xml2string(xmldata, action, indent_str),
                            action=False)
                 action.done('skipped', status=('%s catalogs aren\'t '
                                                'complete enough - %.2f done' % (
@@ -593,7 +594,7 @@ class ImportCommand(Command):
                 self.w.message('%s doesn\'t exist' % language_po.rel, 'warning')
                 continue
 
-            content = xml2string(po2xml(self.env, action, catalogs[kind]), action)
+            content = xml2string(po2xml(self.env, action, catalogs[kind]), action, indent_str)
             write_file(self, language_xml, content, action=action)
 
     def execute(self):
